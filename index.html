@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>reveal.js – The HTML Presentation Framework</title>
+
+        <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+        <meta name="author" content="Hakim El Hattab">
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+         var link = document.createElement( 'link' );
+         link.rel = 'stylesheet';
+         link.type = 'text/css';
+         link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+         document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+
+        <!--[if lt IE 9]>
+            <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <div class="slides">
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## FP in Scala
+
+                        ### Chapters 3 & 4
+
+                        Yay.
+                    </script>
+                </section>
+
+
+                <section>
+                    <section data-markdown>
+                        <script type="text/template">
+                            ## Quick Recap
+
+                            - Functions are neat.
+                            - Functions as first class values is neat.
+                            - Types are neat.
+                            - Polymorphism is neat.
+                            - Parametricity is neat.
+                            - Polymorphic Parametricity is super neat.
+
+                            and by their powers combined...*deep breath*
+                        </script>
+                    </section>
+
+                    <section>
+                        Passing around polymorphic functions that allow you to reason about them using parametricity with fast and loose reasoning is just... <br /><br />
+
+                        <img alt="OH YEAH" src="img/power_up.gif"/>
+                    </section>
+
+                    <section>
+                        <h2>See ...</h2>
+                        <pre><code class="hljs" data-trim contenteditable>
+def ...(name: String, n: Int, f: Int => Int): String
+                        </code></pre>
+                        You already know what this function does, don't you? <br /><br />
+                        Parametricity + fast and loose reasoning, woo!
+                    </section>
+
+                    <section>
+                        <h2>... and this one</h2>
+                        <pre><code class="hljs" data-trim contenteditable>
+def ...[A](as: Array[A], f: (A,A) => Boolean): Boolean
+                        </code></pre>
+                        Foolish `A`, I care not about you.
+                    </section>
+
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## Chapter 3
+                        ## Functional Data Structures
+                    </script>
+                </section>
+
+                <section>
+                    <h2>Definition</h2>
+                    <ul>
+                        <li>Operated on with pure functions</li>
+                        <li>Pure functions must not change data in place </li>
+                        <li>By definition, functional data structures are <strong>immutable</strong> </li>
+                    </ul>
+                    </script>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Venerable Singly Linked List</h2>
+                        <pre><code class="hljs" data-trim contenteditable>
+package fpinscala.datastructures
+
+sealed trait List[+A]
+case object Nil extends List[Nothing]
+case class Cons[+A](head: A, tail: List[A]) extends List[A]
+                        </code></pre>
+
+                        <aside class="notes">
+                            <p> different, but close to the one used in the std lib </p>
+                            <p> trait : abstract interface to a data type </p>
+                            <p> recall: sealed means all implementations must be in this file</p>
+                            <p> Just like functions, data types can be polymorphic over A </p>
+                        </aside>
+                    </section>
+
+                    <section>
+                        <h2>How does List[A] ?</h2>
+                        <pre><code class="hljs" data-trim contenteditable>
+List("a", "b") == Cons("a", Cons("b", Nil))
+                        </code></pre>
+                        Thanks to polymorphism, we can do this:
+                        <pre><code class="hljs" data-trim contenteditable>
+val ex1: List[Double] = Nil
+val ex2: List[Int] = Cons(1, Nil)
+val ex3: List[List[String]] = Cons(Cons("A",Nil), Cons("B", Cons("C", Nil)))
+                        </code></pre>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ## Quick Note on Variance...
+                            - You may have noticed the declaration
+                            <pre><code class="hljs">List[+A]</code></pre>
+                            - The `+` on a type is a <i>variance annotation</i>
+                            - In this case it means that...
+                            <pre><code class="hljs">List[Dog]</code></pre>
+                            - is a subtype of...
+                            <pre><code class="hljs">List[Animal]</code></pre>
+                            - <i>Nothing</i> is the subtype of all types.
+                        </script>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Time & State</h2>
+                        <ul>
+                            <li>Functional Data Structures often have a constructor for each possible state.</li>
+                            <li>But that state cannot change without explicit action, yay immutablility.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <div>
+                            <pre><code class="hljs scala">
+sealed trait Tree[+A]
+case class Leaf[A](a: A) extends Tree[A]
+case class Branch[A](l: Tree[A], r: Tree[A]) extends Tree[A]
+                            </code></pre>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Thinking & Seeing</h2>
+                        <ul>
+                            <li>What do such properties provide?</li>
+                            <li>We only have to worry about a single state at a time.</li>
+                            <li>We can explicitly express an interest in the state of a structure through pattern matching.</li>
+                            <li>Explicit statements and immutability provide greater room for optimisations.</li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Pattern Matching</h2>
+                        <div class="fragment">
+                            <pre><code class="hljs scala"> def sum(ints: List[Int]): Int = ints match {</code></pre>
+                        </div>
+                        <div class="fragment">
+                            <pre><code class="hljs scala">  case Nil => 0</code></pre>
+                        </div>
+                        <div class="fragment">
+                            <pre><code class="hljs scala">  case Cons(x,xs) => x + sum(xs)</code></pre>
+                        </div>
+                        <div class="fragment">
+                            <pre><code class="hljs scala">}</code></pre>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Moar Ma-ching Patturn</h2>
+                        <div class="fragment">
+                            <pre><code class="hljs scala">def product(ds: List[Double]): Double = ds match {</code></pre>
+                        </div>
+                        <div class="fragment">
+                            <pre><code class="hljs scala">  case Nil => 1.0</code></pre>
+                        </div>
+                        <div class="fragment">
+                            <pre><code class="hljs scala">  case Cons(0.0,_) => 0.0</code></pre>
+                        </div>
+                        <div class="fragment">
+                            <pre><code class="hljs scala">  case Cons(x,xs) => x * product(xs)</code></pre>
+                        </div>
+                        <div class="fragment">
+                            <pre><code class="hljs scala">}</code></pre>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Powerful Patterns - c/o Erlang</h2>
+                        <pre><code class="hljs erlang">
+case Segment of
+  << SourcePort:16, DestinationPort:16,
+     SequenceNumber:32,
+     AckNumber:32,
+     DataOffset:4, _Reserved:4, Flags:8, WindowSize:16,
+     Checksum:16, UrgentPointer:16,
+     Payload/binary>> when DataOffset > 4
+	-> ...
+                            </code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Data Sharing</h2>
+                        <div class="fragment">
+                            That's nice... but how am I supposed to use data I cannot change?
+                        </div>
+                        <div class="fragment">
+                            Easy! Make a new one!!
+                        </div>
+                        <div class="fragment">
+                            OMG! No wonder you FP weenies love garbage collection...
+                            <img alt="sigh..." src="img/yoda_sad.gif"/>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Simplicity</h2>
+                        <img alt="ay-yup" src="img/data_sharing.png"/>
+                    </section>
+
+                    <section>
+                        <h2>Example? Alright..</h2>
+                        <pre><code class="hljs scala">
+def append[A](a1: List[A], a2: List[A]): List[A] = a1 match {
+  case Nil => a2
+  case Cons(h,t) => Cons(h, append(t, a2))
+}
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Compiler Gutter Bumpers</h2>
+                        <div class="fragment"><pre><code class="hljs scala">
+def dropWhile[A](l: List[A], f: A => Boolean): List[A]
+                        </code></pre></div>
+
+                        <div class="fragment">
+                            <pre><code class="hljs scala">
+val xs: List[Int] = List(1,2,3,4,5)
+val ex1 = dropWhile(xs, (x: Int) => x < 4)
+                            </code></pre>
+                        </div>
+
+                    </section>
+
+                    <section>
+                        <h2>Improving Inference</h2>
+                        <div class="fragment"><pre><code class="hljs scala">
+def dropWhile[A]( l: List[A] )( f: A => Boolean ): List[A]
+                        </code></pre></div>
+
+                        <div class="fragment"><pre><code class="hljs scala">
+val xs: List[Int] = List(1,2,3,4,5)
+val ex1 = dropWhile(xs)(x => x < 4) // or dropWhile(xs)( _ < 4 )
+                        </code></pre></div>
+                    </section>
+
+                </section>
+                <!-- End of Slides Yo. -->
+            </div>
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+
+         // Full list of configuration options available at:
+                // https://github.com/hakimel/reveal.js#configuration
+         Reveal.initialize({
+             controls: true,
+             progress: true,
+             history: true,
+             center: true,
+
+             transition: 'zoom', // none/fade/slide/convex/concave/zoom
+
+             // Optional reveal.js plugins
+             dependencies: [
+                 { src: 'lib/js/classList.js',
+                   condition: function() { return !document.body.classList; }
+                 },
+                 { src: 'plugin/markdown/marked.js',
+                   condition: function() { return !!document.querySelector( '[data-markdown]' ); }
+                 },
+                 { src: 'plugin/markdown/markdown.js',
+                   condition: function() { return !!document.querySelector( '[data-markdown]' ); }
+                 },
+					       { src: 'plugin/highlight/highlight.js',
+                   async: true,
+                   callback: function() { hljs.initHighlightingOnLoad(); }
+                 },
+					       { src: 'plugin/zoom-js/zoom.js', async: true },
+					       { src: 'plugin/notes/notes.js', async: true }
+				     ]
+			   });
+
+		    </script>
+
+	  </body>
+</html>

@@ -1,3 +1,13 @@
+Sealed traits haven't been explained yet.
+Box diagrams.
+More diagrams for linked list.
+Something explicit for the recursion examples.
+mention Okasaki - because OH. MY. GOD.
+moar speaker notes.
+step through map.
+mention the exercises, very very very handy and lots of fun.
+Glue map & dropWhile together for the inference example.
+
 # reveal.js [![Build Status](https://travis-ci.org/hakimel/reveal.js.svg?branch=master)](https://travis-ci.org/hakimel/reveal.js)
 
 A framework for easily creating beautiful presentations using HTML. [Check out the live demo](http://lab.hakim.se/reveal-js/).

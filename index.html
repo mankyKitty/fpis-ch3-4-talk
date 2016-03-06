@@ -4,10 +4,10 @@
     <head>
         <meta charset="utf-8">
 
-        <title>reveal.js – The HTML Presentation Framework</title>
+        <title>FP in Scala - Chapters 3 & 4</title>
 
-        <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
-        <meta name="author" content="Hakim El Hattab">
+        <meta name="description" content="A presentation of chapters 3 & 4, from FP in Scala">
+        <meta name="author" content="Sean Chalmers">
 
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -36,195 +36,188 @@
 
     <body>
 
-        <div class="reveal">
+      <div class="reveal">
 
-            <div class="slides">
+        <div class="slides">
 
-                <section data-markdown>
-                    <script type="text/template">
-                        ## FP in Scala
+          <section data-markdown>
+            <h2>FP in Scala</h2>
+            <h3>Chapters 3 & 4</h3>
 
-                        ### Chapters 3 & 4
+            Yay.
+          </section>
+          <section>
+            <section data-markdown>
+              <script type="text/template">
+                ## Quick Recap
 
-                        Yay.
-                    </script>
-                </section>
+                - Functions are neat.
+                - Functions as first class values is neat.
+                - Types are neat.
+                - Polymorphism is neat.
+                - Parametricity is neat.
+                - Polymorphic Parametricity is super neat.
 
+                and by their powers combined...*deep breath*
+              </script>
+            </section>
 
-                <section>
-                    <section data-markdown>
-                        <script type="text/template">
-                            ## Quick Recap
+            <section>
+              Passing around polymorphic functions that allow you to reason about them using parametricity with fast and loose reasoning is just... <br /><br />
 
-                            - Functions are neat.
-                            - Functions as first class values is neat.
-                            - Types are neat.
-                            - Polymorphism is neat.
-                            - Parametricity is neat.
-                            - Polymorphic Parametricity is super neat.
+              <img alt="OH YEAH" src="img/power_up.gif"/>
+            </section>
 
-                            and by their powers combined...*deep breath*
-                        </script>
-                    </section>
-
-                    <section>
-                        Passing around polymorphic functions that allow you to reason about them using parametricity with fast and loose reasoning is just... <br /><br />
-
-                        <img alt="OH YEAH" src="img/power_up.gif"/>
-                    </section>
-
-                    <section>
-                        <h2>See ...</h2>
-                        <pre><code class="hljs" data-trim contenteditable>
+            <section>
+              <h2>See ...</h2>
+              <pre><code class="hljs" data-trim contenteditable>
 def ...(name: String, n: Int, f: Int => Int): String
-                        </code></pre>
-                        You already know what this function does, don't you? <br /><br />
-                        Parametricity + fast and loose reasoning, woo!
-                    </section>
+              </code></pre>
+              You already know what this function does, don't you? <br /><br />
+              Parametricity + fast and loose reasoning, woo!
+            </section>
 
-                    <section>
-                        <h2>... and this one</h2>
-                        <pre><code class="hljs" data-trim contenteditable>
+            <section>
+              <h2>... and this one</h2>
+              <pre><code class="hljs" data-trim contenteditable>
 def ...[A](as: Array[A], f: (A,A) => Boolean): Boolean
-                        </code></pre>
-                        Foolish `A`, I care not about you.
-                    </section>
+              </code></pre>
+              Foolish `A`, I care not about you.
+            </section>
 
-                </section>
+          </section>
 
-                <section data-markdown>
-                    <script type="text/template">
-                        ## Chapter 3
-                        ## Functional Data Structures
-                    </script>
-                </section>
+          <section data-markdown>
+            <script type="text/template">
+              ## Chapter 3
+              ## Functional Data Structures
+            </script>
+          </section>
 
-                <section>
-                    <h2>Definition</h2>
-                    <ul>
-                        <li>Operated on with pure functions</li>
-                        <li>Pure functions must not change data in place </li>
-                        <li>By definition, functional data structures are <strong>immutable</strong> </li>
-                    </ul>
-                    </script>
-                </section>
+          <section>
+            <h2>Definition</h2>
+            <ul>
+              <li>Operated on with pure functions</li>
+              <li>Pure functions on functional data structures can't perform side effects</li>
+              <li>Mutation can happen, but it'll never escape.</li>
+              <li>By definition, functional data structures are <strong>immutable</strong> </li>
+            </ul>
+        </script>
+          </section>
 
-                <section>
-                    <section>
-                        <h2>Venerable Singly Linked List</h2>
-                        <pre><code class="hljs" data-trim contenteditable>
+          <section>
+            <section>
+              <h2>Venerable Singly Linked List</h2>
+              <pre><code class="hljs" data-trim contenteditable>
 package fpinscala.datastructures
 
 sealed trait List[+A]
 case object Nil extends List[Nothing]
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
-                        </code></pre>
+              </code></pre>
 
-                        <aside class="notes">
-                            <p> different, but close to the one used in the std lib </p>
-                            <p> trait : abstract interface to a data type </p>
-                            <p> recall: sealed means all implementations must be in this file</p>
-                            <p> Just like functions, data types can be polymorphic over A </p>
-                        </aside>
-                    </section>
+              <aside class="notes">
+                <p>Introduce sealed traits, all definitions must be in this file.</p>
+                <p> different, but close to the one used in the std lib </p>
+                <p> trait : abstract interface to a data type </p>
+                <p> sealed means all implementations must be in this file</p>
+                <p> Just like functions, data types can be polymorphic over A </p>
+              </aside>
+            </section>
 
-                    <section>
-                        <h2>How does List[A] ?</h2>
-                        <pre><code class="hljs" data-trim contenteditable>
-List("a", "b") == Cons("a", Cons("b", Nil))
-                        </code></pre>
-                        Thanks to polymorphism, we can do this:
-                        <pre><code class="hljs" data-trim contenteditable>
+            <section>
+              <h2>How does it work?</h2>
+              <img alt="nifty" src="img/list_box.png"/>
+            </section>
+
+            <section>
+              <h2>Thanks to polymorphism, we can do this:</h2>
+              <pre><code class="hljs scala" data-trim contenteditable>
 val ex1: List[Double] = Nil
 val ex2: List[Int] = Cons(1, Nil)
 val ex3: List[List[String]] = Cons(Cons("A",Nil), Cons("B", Cons("C", Nil)))
-                        </code></pre>
-                    </section>
+              </code></pre>
 
-                    <section data-markdown>
-                        <script type="text/template">
-                            ## Quick Note on Variance...
-                            - You may have noticed the declaration
-                            <pre><code class="hljs">List[+A]</code></pre>
-                            - The `+` on a type is a <i>variance annotation</i>
-                            - In this case it means that...
-                            <pre><code class="hljs">List[Dog]</code></pre>
-                            - is a subtype of...
-                            <pre><code class="hljs">List[Animal]</code></pre>
-                            - <i>Nothing</i> is the subtype of all types.
-                        </script>
-                    </section>
-                </section>
+              <aside class="notes">
+                <p>Variance, Dog < Animal, List[Dog] < List[Animal]</p>
+              </aside>
+            </section>
 
-                <section>
-                    <section>
-                        <h2>Time & State</h2>
-                        <ul>
-                            <li>Functional Data Structures often have a constructor for each possible state.</li>
-                            <li>But that state cannot change without explicit action, yay immutablility.</li>
-                        </ul>
-                    </section>
+          </section>
 
-                    <section>
-                        <div>
-                            <pre><code class="hljs scala">
+          <section>
+            <section>
+              <h2>Time & State</h2>
+              <ul>
+                <li>Functional Data Structures often have a constructor for each possible state.</li>
+                <li>But that state cannot change without explicit action, yay immutablility.</li>
+              </ul>
+            </section>
+
+            <section>
+              <div>
+                <pre><code class="hljs scala">
 sealed trait Tree[+A]
+case object Empty extends Tree[Nothing]
 case class Leaf[A](a: A) extends Tree[A]
 case class Branch[A](l: Tree[A], r: Tree[A]) extends Tree[A]
-                            </code></pre>
-                        </div>
-                    </section>
+                </code></pre>
+              </div>
+            </section>
 
-                    <section>
-                        <h2>Thinking & Seeing</h2>
-                        <ul>
-                            <li>What do such properties provide?</li>
-                            <li>We only have to worry about a single state at a time.</li>
-                            <li>We can explicitly express an interest in the state of a structure through pattern matching.</li>
-                            <li>Explicit statements and immutability provide greater room for optimisations.</li>
-                        </ul>
-                    </section>
-                </section>
+            <section>
+              <h2>Thinking & Seeing</h2>
+              <ul>
+                <li>What do such properties provide?</li>
+                <li>We only have to worry about a single state at a time.</li>
+                <li>We can explicitly express an interest in the state of a structure through pattern matching.</li>
+                <li>Explicit statements and immutability provide greater room for optimisations.</li>
+              </ul>
+            </section>
+          </section>
 
-                <section>
-                    <section>
-                        <h2>Pattern Matching</h2>
-                        <div class="fragment">
-                            <pre><code class="hljs scala"> def sum(ints: List[Int]): Int = ints match {</code></pre>
-                        </div>
-                        <div class="fragment">
-                            <pre><code class="hljs scala">  case Nil => 0</code></pre>
-                        </div>
-                        <div class="fragment">
-                            <pre><code class="hljs scala">  case Cons(x,xs) => x + sum(xs)</code></pre>
-                        </div>
-                        <div class="fragment">
-                            <pre><code class="hljs scala">}</code></pre>
-                        </div>
-                    </section>
+          <section>
+            <section>
+              <h2>Pattern Matching</h2>
+              <div class="fragment">
+                <pre><code class="hljs scala"> def sum(ints: List[Int]): Int = ints match {</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">  case Nil => 0</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">  case Cons(x,xs) => x + sum(xs)</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">}</code></pre>
+              </div>
+            </section>
 
-                    <section>
-                        <h2>Moar Ma-ching Patturn</h2>
-                        <div class="fragment">
-                            <pre><code class="hljs scala">def product(ds: List[Double]): Double = ds match {</code></pre>
-                        </div>
-                        <div class="fragment">
-                            <pre><code class="hljs scala">  case Nil => 1.0</code></pre>
-                        </div>
-                        <div class="fragment">
-                            <pre><code class="hljs scala">  case Cons(0.0,_) => 0.0</code></pre>
-                        </div>
-                        <div class="fragment">
-                            <pre><code class="hljs scala">  case Cons(x,xs) => x * product(xs)</code></pre>
-                        </div>
-                        <div class="fragment">
-                            <pre><code class="hljs scala">}</code></pre>
-                        </div>
-                    </section>
+            <section>
+              <h2>Say what now?</h2>
+              <div class="fragment">
+                <pre><code class="hljs scala">sum(Cons(1, Cons(2, Cons(3, Nil))))</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">1 + sum(Cons(2, Cons(3, Nil)))</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">1 + 2 + sum(Cons(3, Nil))</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">1 + 2 + 3 + sum(Nil)</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">1 + 2 + 3 + 0</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">6</code></pre>
+              </div>
+            </section>
 
-                    <section>
-                        <h2>Powerful Patterns - c/o Erlang</h2>
-                        <pre><code class="hljs erlang">
+            <section>
+              <h2>Powerful Patterns - c/o Erlang</h2>
+              <pre><code class="hljs erlang">
 case Segment of
   << SourcePort:16, DestinationPort:16,
      SequenceNumber:32,
@@ -233,110 +226,536 @@ case Segment of
      Checksum:16, UrgentPointer:16,
      Payload/binary>> when DataOffset > 4
 	-> ...
-                            </code></pre>
-                    </section>
-                </section>
+              </code></pre>
+            </section>
+          </section>
 
-                <section>
-                    <section>
-                        <h2>Data Sharing</h2>
-                        <div class="fragment">
-                            That's nice... but how am I supposed to use data I cannot change?
-                        </div>
-                        <div class="fragment">
-                            Easy! Make a new one!!
-                        </div>
-                        <div class="fragment">
-                            OMG! No wonder you FP weenies love garbage collection...
-                            <img alt="sigh..." src="img/yoda_sad.gif"/>
-                        </div>
-                    </section>
+          <section>
+            <section>
+              <h2>Data Sharing</h2>
+              <div class="fragment">
+                That's nice... but how am I supposed to use data I cannot change?
+              </div>
+              <div class="fragment">
+                Easy! Make a new one!!
+              </div>
+              <div class="fragment">
+                OMG! No wonder you FP weenies love garbage collection...
+                <img alt="sigh..." src="img/yoda_sad.gif"/>
+              </div>
+            </section>
 
-                    <section>
-                        <h2>Simplicity</h2>
-                        <img alt="ay-yup" src="img/data_sharing.png"/>
-                    </section>
+            <section>
+              <h2>Simplicity</h2>
+              <img alt="ay-yup" src="img/data_sharing.png"/>
+            </section>
 
-                    <section>
-                        <h2>Example? Alright..</h2>
-                        <pre><code class="hljs scala">
-def append[A](a1: List[A], a2: List[A]): List[A] = a1 match {
-  case Nil => a2
-  case Cons(h,t) => Cons(h, append(t, a2))
+            <section>
+              <h2>For example....</h2>
+              <div class="fragment">
+                <pre><code class="hljs scala">def map[A,B](xs: List[A], f: A => B): List[B] =</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">  xs match {</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">    case Nil => Nil</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">    case Cons(h,t) => Cons(f(h), map(t, f))</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">  }</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">}</code></pre>
+              </div>
+            </section>
+
+            <section>
+              <h2>Wat?</h2>
+              <div class="fragment">
+                <pre><code class="hljs scala">map(Cons(1,Cons(2,Cons(3,Nil))), (n : Int => n + 1))</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">Cons( 1 + 1, map(Cons(2,Cons(3,Nil)), (n : Int => n + 1)))</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">Cons( 2, Cons( 2 + 1, map(Cons(3,Nil), (n : Int => n + 1))))</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">Cons( 2, Cons( 3, Cons( 3 + 1, map(Nil, (n : Int => n + 1)))))</code></pre>
+              </div>
+              <div class="fragment">
+                <pre><code class="hljs scala">Cons( 2, Cons( 3, Cons( 4, Nil )))</code></pre>
+              </div>
+            </section>
+          </section>
+
+          <section>
+            <section>
+              <h2>However...</h2>
+              <div class="fragment">
+                <pre><code class="hljs scala">map[A,B]( xs: List[A], f: A => B): List[B]</code></pre>
+              </div>
+
+              <div class="fragment">
+                <pre><code class="hljs scala">
+val l = List(1,2,3,4,5)
+map(l, ( x => x + 1) )
+                </code></pre>
+              </div>
+
+              <div class="fragment">
+                <pre><code class="hljs scala">
+error: missing parameter type for expanded function
+  ((x$1) => x$1.$plus(1))
+                </code></pre>
+                :(
+              </div>
+            </section>
+
+            <section>
+              <h2>Improving Type Inference</h2>
+              <div class="fragment"><pre><code class="hljs scala">
+map[A,B]( xs: List[A] )(f: A => B): List[B]
+              </code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">
+map( List(1,2,3) )( x => x + 1 )
+              </code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">
+List(2,3,4)
+              </code></pre></div>
+            </section>
+
+            <section>
+              <h2>So much fun</h2>
+              <ul>
+                <li>Okasaki - Purely Functional Data Structures (basically, kind of a big deal)</li>
+                <li>Proved that these structures can be as, if not more, efficient than their mutable/non-functional counterparts</li>
+                <li>Chapter is <strong>FULL</strong> of awesome exercises, hop to it.</li>
+              </ul>
+            </section>
+          </section>
+
+          <section>
+            <h2>Handling Errors without exceptions</h2>
+            <p>Ermagerd. :D</p>
+          </section>
+
+          <section>
+            <p>Throwing exceptions, is a side effect.</p>
+            <p>What do we do instead?</p>
+            <p>Let's give that function a value. Functions love values.</p>
+
+
+            <aside class="notes">
+              <p>Failures & Exceptions can be represented as pure values.</p>
+              <p>If they're values, we can have higher-order functions to handle common patterns.</p>
+            </aside>
+          </section>
+
+          <section>
+            <section>
+              <h2>Hrmmm?</h2>
+              <pre><code class="hljs scala">
+def failingFn(i: Int): Int = {
+  val y:Int = throw new Exception("wup-wah")
+  try {
+    val x = 42 + 5
+    x + y
+  }
+  catch { case e: Exception => 43 }
 }
-                        </code></pre>
-                    </section>
-                </section>
+              </code></pre>
 
-                <section>
-                    <section>
-                        <h2>Compiler Gutter Bumpers</h2>
-                        <div class="fragment"><pre><code class="hljs scala">
-def dropWhile[A](l: List[A], f: A => Boolean): List[A]
-                        </code></pre></div>
+              <aside class="notes">
+                <p>Y is not referentially transparent.</p>
+                <p>the :Int assigns the right hand side of '=' as Int</p>
+                <p>catch block is a pattern matching block.</p>
+              </aside>
+            </section>
 
-                        <div class="fragment">
-                            <pre><code class="hljs scala">
-val xs: List[Int] = List(1,2,3,4,5)
-val ex1 = dropWhile(xs, (x: Int) => x < 4)
-                            </code></pre>
-                        </div>
+            <section>
+              <h2>Nuuuu!<br />mah referential transparency.</h2>
+              <pre><code class="hljs scala">
+def failingFn2(i: Int): Int = {
+  try {
+    val x = 42 + 5
+    x + ((throw new Exception("fail!")): Int)
+  }
+  catch { case e: Exception => 43 }
+}
+              </code></pre>
+              <aside class="notes">
+                <p>we should be able to replace Y with its value, but we can't.</p>
+                <p>exceptions break RT and introduce context dependency</p>
+                <p>exceptions are not type safe, Int => Int tells us nothing about the hidden exception.</p>
+              </aside>
+            </section>
+          </section>
 
-                    </section>
+          <section>
+            <section>
+              <blockquote cite="George Wilson">
+                &ldquo;THAT'S NOT GOOD ENOUGH!!!&rdquo;<br />
+                -- George Wilson, 2015
+              </blockquote>
+              <pre><code class="hljs scala">
+def mean(xs: Seq[Double]): Double =
+  if (xs.isEmpty)
+    throw new ArithmeticException("mean of empty list!")
+  else xs.sum / xs.length
+              </code></pre>
+              <aside class="notes">
+                <p>Seq is the common interface of linear sequence-like collections.</p>
+                <p>it's partial</p>
+                <p>could return a bogus value, 0.0, null, NaN, common in other languages</p>
+              </aside>
+            </section>
 
-                    <section>
-                        <h2>Improving Inference</h2>
-                        <div class="fragment"><pre><code class="hljs scala">
-def dropWhile[A]( l: List[A] )( f: A => Boolean ): List[A]
-                        </code></pre></div>
+            <section>
+              <h2>Problems...</h2>
+              <ul>
+                <li>Allows errors to silenty propagate</li>
+                <li>More boilerplate... leads to code like this:
+                  <pre><code class="hljs go">
+(err, foo) := bar(wat)
+if err != nil {
+  panic("oh noes")
+}
+(err, fuu) := fab(foo)
+if err != nil {
+  panic("ermagerd!")
+}
+                  </code></pre>
+                </li>
+                <li>Not usable with polymorphic code</li>
+              </ul>
 
-                        <div class="fragment"><pre><code class="hljs scala">
-val xs: List[Int] = List(1,2,3,4,5)
-val ex1 = dropWhile(xs)(x => x < 4) // or dropWhile(xs)( _ < 4 )
-                        </code></pre></div>
-                    </section>
+              <aside class="notes">
+                <p>Polymorphic function returning an A cannot return 'null' as null only valid for non-primitive types</p>
+                <p>A might be a Int or Double, which are primitive types</p>
+                <p>Functions require special policies when called, can't simply call function and use the result.</p>
+              </aside>
+            </section>
 
-                </section>
-                <!-- End of Slides Yo. -->
-            </div>
+            <section>
+              <h2>Defaults!</h2>
+              <pre><code class="hljs scala">
+def meanP(xs: Seq[Double], onEmpty: Double): Double =
+  if (xs.isEmpty) onEmpty
+  else xs.sum/ xs.length
+              </code></pre>
+              <blockquote cite="George Wilson">
+                &ldquo;THAT'S STILL NOT GOOD ENOUGH!!!&rdquo;<br />
+                -- George Wilson, 2015
+              </blockquote>
+              <aside class="notes">
+                <p>It's now total</p>
+                <p>Onus is now on caller to understand how to handle the undefined case</p>
+                <p>limits returnining only a double on failure.</p>
+              </aside>
+            </section>
+          </section>
+
+          <section>
+            <section>
+              <h2>Option Type!</h2>
+              <p>A type that explicitly states that a question may not have an answer</p>
+              <pre><code class="hljs scala">sealed trait Option[+A]
+case object None extends Option[Nothing]
+case class Some[+A](a: A) extends Option[A]</code></pre>
+            </section>
+
+            <section>
+              <h2>Now we're cooking</h2>
+              <div class="fragment"><pre><code class="hljs scala">def mean( xs: Seq[Double] ): Option[Double] =</code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">  if (xs.isEmpty) None</code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">  else Some(xs.sum / xs.length)</code></pre></div>
+              <div class="fragment">
+                <blockquote cite="George Wilson">
+                  &ldquo;THAT MIGHT BE GOOD ENOUGH!!!&rdquo;<br />
+                  -- George Wilson, unknown<br /> <small>possibly not even George.</small>
+                </blockquote>
+              </div>
+
+              <aside class="notes">
+                <p>It's total, like last time.</p>
+                <p>Now the type unambiguously and explicitly states that not all inputs return a result.</p>
+              </aside>
+            </section>
+
+            <section>
+              <h2>Option Patterns</h2>
+              <ul>
+                <li>Map lookup for a given key</li>
+                <li>headOption / lastOption as defined for lists and other iterables.</li>
+              </ul>
+              <aside class="notes">
+                <p>Option is just another type, we're now able to extract the patterns we see.</p>
+                <p>this lets us create generic patterns for handling our errors</p>
+              </aside>
+            </section>
+
+            <section>
+              <h2>Option Functions</h2>
+              <p>Don't want to spoil the exercises for you</p>
+
+              <pre><code class="hljs scala">
+trait Option[+A] {
+  def map[B]( f: A => B ): Option[B]
+
+  def flatMap[B]( f: A => Option[B]): Option[B]
+
+  def getOrElse[B >: A]( default: => B): B
+
+  def orElse[B >: A]( ob: => Option[B]): Option[B]
+
+  def filter( f: A => Boolean): Option[A]
+}
+              </code></pre>
+
+              <aside class="notes">
+                <p>trait object, must be defined in the same file as the sealed trait</p>
+                <p>similar to a companion object, except the target can be referred to as 'self'</p>
+                <p>the '=> B' notation means that B won't be evaluated until we need it, future chapter</p>
+                <p>B >: A means that B is supertype of A, needed to convince scala that Option[+A] is covariant for A</p>
+                <p>Analogous to a List, similar functions exist</p>
+              </aside>
+            </section>
+          </section>
+
+          <section>
+            <section>
+              <h2>So lets do some together</h2>
+              <div class="fragment"><pre><code class="hljs scala">def map[B](f: A => B): Option[B] = </code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">  self match {</code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">    case None => None</code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">    case Some(a) => Some(f(a))</code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">  }</code></pre></div>
+            </section>
+
+            <section>
+              <h2>More than one way...</h2>
+              <div class="fragment"><pre><code class="hljs scala">def flatMap[B](f: A => Option[B]): Option[B] =</code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">  self match {</code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">    case None => ... </code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">    case Some(a) => ...</code></pre></div>
+              <div class="fragment"><pre><code class="hljs scala">  }</code></pre></div>
+            </section>
+            <aside class="notes">
+              not necessarily the best way to implement this function.
+            </aside>
+          </section>
+
+          <section>
+            <section>
+              <h2>Applied Option</h2>
+              Consider the following...
+              <pre><code class="hljs scala">
+case class Employee(
+  name:String,
+  dept:String,
+  manager:Option[Employee]
+)
+def lookupByName( name:String ): Option[Employee]
+              </code></pre>
+            </section>
+
+            <section>
+              <h2>Simple scenario, lookup</h2>
+              <img alt="" src="img/option_use_1.png"/>
+            </section>
+
+            <section>
+              <h2>possibilities within possibilities</h2>
+              <img alt="" src="img/option_use_2.png"/>
+            </section>
+
+            <section>
+              <h2>Possibilities with defaults...</h2>
+              <img alt="" src="img/option_use_3.png"/>
+            </section>
+
+            <section>
+              <h2>Multiple Failures</h2>
+              <ul>
+                <li>flatMap allows you to build computations with multiple points of failure</li>
+                <li>By design it will abort as soon as the first failure is encountered.</li>
+                <li><pre><code class="hljs scala">None.flatMap(f) //  will immediately return None.</code></pre></li>
+                <li>Exercise 4.2 is a great example of this, that's why I'm not solving it for you. ;)</li>
+              </ul>
+              <aside class="notes">
+                <p>f is never run in the code example.</p>
+              </aside>
+            </section>
+          </section>
+
+          <section>
+            <h2>Don't be tempted by the dark side</h2>
+            <div class="fragment"><pre><code class="hljs scala">o.getOrElse(throw new Exception("FAIL"))</code></pre><div>
+          </section>
+
+          <section>
+            <section>
+              <h2>Higher Order Awesome</h2>
+              <ul>
+                <li>Returning errors as values simplifies reasoning</li>
+                <li>Can consolidate the error handling logic in generic functions</li>
+                <li>Several computations can be performed at a time</li>
+                <li>Error checking deferred until it's important</li>
+                <li>The compiler helps us ensure coverage</li>
+              </ul>
+              <aside class="notes">
+                <p>Composition, lifting, options littering the code.</p>
+                <p>Map takes any A => B and turns it into Option[A] => Option[B]</p>
+                <p>Try general function for catching exceptions into Options</p>
+              </aside>
+            </section>
+          </section>
+
+          <section>
+            <h2>for Comprehensions</h2>
+            <p>
+              The act of lifting functions is so common that Scala has some syntax sugar for helping out.
+              Expands automatically into chained calls to 'flatMap'.</p>
+            <p>Recall the signature: <pre><code class="hljs scala">flatMap[B]( f: A => Option[B]): Option[B]</code></pre></p>
+            <pre><code class="hljs scala">
+for {
+  e1 <- lookupByName(e1Name)
+  pet <- lookupPetsName(e1)
+} yield pet.name
+            </code></pre>
+            <aside class="notes">
+              <p>sequence of bindings that are converted to flatMap calls</p>
+              <p>final yield is a call to map</p>
+              <p>useful when dealing with multiple flatMap operations/values depend on one another.</p>
+            </aside>
+          </section>
+
+          <section>
+            <section>
+              <h2>Either helpful option</h2>
+              <ul>
+                <li>Option isn't our only tool for handling exceptions as values.</li>
+                <li>'None' doesn't tell us much.</li>
+                <li>Wouldn't it be nice if we could provide some information about the failures?</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2>Well Jim, it's a good thing you asked.</h2>
+              <p>Presenting, the Either type:</p>
+              <pre><code class="hljs scala">
+sealed trait Either[+E, +A]
+case class Left[+E](value: E) extends Either[E, Nothing]
+case class Right[+A](value: A) extends Either[Nothing, A]
+              </code></pre>
+              <aside class="notes">
+                <p>only two cases, like option</p>
+                <p>represent a disjoint union of two types.</p>
+                <p>Convention is to use the 'Right' value as correct, pun on being right.</p>
+                <p>thus, Left is error or incorrect result.</p>
+              </aside>
+            </section>
+
+            <section>
+              <h2>Wat</h2>
+              <pre><code class="hljs scala">
+def mean(xs: Seq[Double]): Either[String, Double] =
+  if (xs.isEmpty)
+    Left("mean of an empty list")
+  else
+    Right(xs.sum / xs.length)
+              </code></pre>
+              <p>Can you spot a possible problem here?</p>
+            </section>
+
+            <section>
+              <h2>More Higher Order Awesome</h2>
+              <p>You can map and flatMap Either values.</p>
+              <p>Either can be used in 'for' comprehensions</p>
+              <pre><code class="hljs scala">
+case class Person(name: Name, age: Age)
+sealed class Name(val value: String)
+sealed class Age(val value: Int)
+
+def mkName(n:String): Either[String,Name] = ...
+def mkAge(a:Int): Either[String,Age] = ...
+              </code></pre>
+              <aside class="notes">
+                <p>Sealed classes cannot be extended outside of the file/package their defined in.</p>
+                <p>Similar to newtypes in Haskell</p>
+              </aside>
+            </section>
+
+            <section>
+              <pre><code class="hljs scala">
+def mkPerson(name:String, age:Int): Either[String, Person] =
+  for {
+    n <- mkName(name)
+    a <- mkAge(age)
+  } yield Person(n,a)
+              </code></pre>
+              <aside class="notes">
+                <p>Will abort early if the name does not meet requirements.</p>
+                <p>We will be given a message about why this function failed</p>
+                <p>How could we improve this error handling?</p>
+              </aside>
+            </section>
+          </section>
+
+          <section>
+            <h2>Conclusion</h2>
+            <ul>
+              <li>We covered some of the problems with exceptions.</li>
+              <li>Explained the basic principles of purely functional error handling</li>
+              <li>Option and Either types are just the beginning</li>
+              <li>Errors as values and HOFs encapsulate common patterns for errors</li>
+              <li>Effects as values is something that is covered many times in the book</li>
+            </ul>
+          </section>
+          <!-- End of Slides Yo. -->
         </div>
+      </div>
 
-        <script src="lib/js/head.min.js"></script>
-        <script src="js/reveal.js"></script>
+      <script src="lib/js/head.min.js"></script>
+      <script src="js/reveal.js"></script>
 
-        <script>
+      <script>
 
-         // Full list of configuration options available at:
-                // https://github.com/hakimel/reveal.js#configuration
-         Reveal.initialize({
-             controls: true,
-             progress: true,
-             history: true,
-             center: true,
+        // Full list of configuration options available at:
+        // https://github.com/hakimel/reveal.js#configuration
+        Reveal.initialize({
+          controls: true,
+          progress: true,
+          history: true,
+          center: true,
 
-             transition: 'zoom', // none/fade/slide/convex/concave/zoom
+          transition: 'zoom', // none/fade/slide/convex/concave/zoom
 
-             // Optional reveal.js plugins
-             dependencies: [
-                 { src: 'lib/js/classList.js',
-                   condition: function() { return !document.body.classList; }
-                 },
-                 { src: 'plugin/markdown/marked.js',
-                   condition: function() { return !!document.querySelector( '[data-markdown]' ); }
-                 },
-                 { src: 'plugin/markdown/markdown.js',
-                   condition: function() { return !!document.querySelector( '[data-markdown]' ); }
-                 },
-					       { src: 'plugin/highlight/highlight.js',
-                   async: true,
-                   callback: function() { hljs.initHighlightingOnLoad(); }
-                 },
-					       { src: 'plugin/zoom-js/zoom.js', async: true },
-					       { src: 'plugin/notes/notes.js', async: true }
-				     ]
-			   });
+          // Optional reveal.js plugins
+          dependencies: [
+            { src: 'lib/js/classList.js',
+              condition: function() { return !document.body.classList; }
+            },
+            { src: 'plugin/markdown/marked.js',
+              condition: function() { return !!document.querySelector( '[data-markdown]' ); }
+            },
+            { src: 'plugin/markdown/markdown.js',
+              condition: function() { return !!document.querySelector( '[data-markdown]' ); }
+            },
+					  { src: 'plugin/highlight/highlight.js',
+              async: true,
+              callback: function() { hljs.initHighlightingOnLoad(); }
+            },
+					  { src: 'plugin/zoom-js/zoom.js', async: true },
+					  { src: 'plugin/notes/notes.js', async: true }
+				  ]
+			  });
 
-		    </script>
+		  </script>
 
 	  </body>
 </html>
